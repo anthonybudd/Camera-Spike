@@ -1,0 +1,29 @@
+{
+  "name": "camera-spike",
+  "version": "1.0.0",
+  "description": "<p align=\"center\"> <img src=\"https://github.com/anthonybudd/camera-spike/raw/master/docs/img/header.png\" alt=\"Header\"> </p>",
+  "main": "src/index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anthonybudd/Camera-Spike.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anthonybudd/Camera-Spike/issues"
+  },
+  "homepage": "https://github.com/anthonybudd/Camera-Spike#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "glob": "^7.2.0",
+    "morgan": "^1.10.0"
+  }
+}

@@ -1,0 +1,24 @@
+version: '3.1'
+
+services:
+    camera-spike:
+        build: .
+        entrypoint: "nodemon /app/src/index.js --watch /app --legacy-watch"
+        restart: always
+        container_name: camera-spike
+        volumes:
+            - ${MEDIA_PATH}:/frames
+            - ./:/app
+        ports:
+            - 8000:80
+
+    nginx-tor-proxy:
+        build: 
+          context: ./nginx-tor-proxy
+        restart: always
+        container_name: nginx-tor-proxy
+        volumes:
+            - ./nginx-tor-proxy/web:/web
+            - ./nginx-tor-proxy/nginx:/nginx
+        links:
+            - camera-spike

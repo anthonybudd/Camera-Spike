@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera Spike</title>
+    <script src="/static/vue.js"></script>
+    <script src="/static/axios.min.js"></script>
+    <link href="/static/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .frames-group > .row {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .frames-group > .row > .col-1 {
+            display: inline-block;
+        }
+        .frame img {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <div class="navbar navbar-dark bg-dark shadow-sm">
+                <div class="container">
+                    <a href="#" class="navbar-brand d-flex align-items-center">
+                        <strong>Camera Spike</strong>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <section class="container container-fluid">
+            <div class="row mb-4">
+                <div class="col-md-12 text-center mb-4">
+                    <img style="height:500px" :src="mainImage" />
+                </div>
+
+                <div class="col-md-1">
+                    <button @click="previous" type="button" class="btn btn-primary btn-lg">
+                        Previous
+                    </button>
+                </div>
+
+                <div class="col-md-10">
+                    <div class="container frames-group">
+                        <div class="row text-center">
+                            <div v-for="frame in frames" :key="frame" class="frame col-1">
+                                <img @click="setFrame(frame)" :src="frame" class="w-100" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-1">
+                    <button @click="next" type="button" class="btn btn-primary btn-lg">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data(){
+                return {
+                    day: (new Date().getDate()),
+                    month: (new Date().getMonth()+1),
+                    year: (new Date().getFullYear()),
+                    currentTimestamp: Math.floor(Date.now() / 1000),
+                    mainImage: '',
+                    frames: [],
+                }
+            },
+            async mounted() {
+                const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
+                    params: {
+                        before: this.currentTimestamp
+                    }
+                });
+
+                const extractUnix = (filePath) => (Number(filePath.split('--')[1].split('.')[0]));
+
+                this.frames = frames.map((f) => (`/api/v1/frames/${this.year}/${this.month}/${this.day}/${extractUnix(f)}`));
+                
+                let lastFrame = this.frames[this.frames.length-1];
+                if (lastFrame) this.mainImage = lastFrame;
+            },
+            methods: {
+                previous() {
+                    alert('Previous')
+                },
+                next() {
+                    alert('next')
+                },
+                setFrame(frame) {
+                    this.mainImage = frame;
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
