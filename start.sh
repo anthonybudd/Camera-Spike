@@ -18,7 +18,11 @@ then
 fi
 export CAMERA_TIMEOUT="${CAMERA_TIMEOUT:-10}" 
 export MEDIA_PATH="${MEDIA_PATH:-$(pwd)/images}" 
+export IMAGE_HEIGHT="${IMAGE_HEIGHT:-500}" 
+export IMAGE_WIDTH="${IMAGE_WIDTH:-500}" 
 echo "  ├── CAMERA_TIMEOUT=$CAMERA_TIMEOUT (seconds)"
+echo "  ├── IMAGE_HEIGHT=$IMAGE_HEIGHT"
+echo "  ├── IMAGE_WIDTH=$IMAGE_WIDTH"
 echo "  └── MEDIA_PATH=$MEDIA_PATH"
 echo ""
 
@@ -34,8 +38,8 @@ echo ""
 while :
 do
     mkdir -p $MEDIA_PATH/$(date +"%Y/%m/%d")
-    export IMAGE_PATH=$MEDIA_PATH/$(date +"%Y/%m/%d")/frame-$(date +"%H-%M-%S").jpg
-    raspistill -n -t 1 -o $MEDIA_PATH/$(date +"%Y/%m/%d")/frame-$(date +"%H-%M-%S").jpg
+    export IMAGE_PATH=$MEDIA_PATH/$(date +"%Y/%m/%d")/frame-$(date +"%H-%M-%S")--$(date +"%s").jpg
+    raspistill -n -t 1 -o $IMAGE_PATH
     echo $IMAGE_PATH
-    sleep 5
+    sleep $CAMERA_TIMEOUT
 done
