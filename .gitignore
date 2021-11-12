@@ -1,3 +1,4 @@
 .env
 /images
 dev.js
+/node_modules
