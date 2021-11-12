@@ -25,6 +25,5 @@ sudo chmod a+x /usr/local/bin/docker-compose
 # systemctl enable /opt/docker-compose/docker-compose.service
 
 # nginx-tor-proxy tweaks
-rm -rf nginx-tor-proxy
 git clone https://github.com:anthonybudd/nginx-tor-proxy.git
 sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf 
