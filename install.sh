@@ -19,7 +19,7 @@ sudo apt-get install -y libffi-dev libssl-dev
 sudo apt-get install -y python3 python3-pip
 sudo apt-get remove python-configparser
 sudo pip3 -v install docker-compose
-chmod a+x /usr/local/bin/docker-compose
+sudo chmod a+x /usr/local/bin/docker-compose
 
 # Auto-start Docker
 # systemctl enable /opt/docker-compose/docker-compose.service
@@ -28,4 +28,3 @@ chmod a+x /usr/local/bin/docker-compose
 rm -rf nginx-tor-proxy
 git clone https://github.com:anthonybudd/nginx-tor-proxy.git
 sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf 
-cd nginx-tor-proxy && docker-compose build
