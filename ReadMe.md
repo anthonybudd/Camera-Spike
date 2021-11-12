@@ -11,7 +11,7 @@ Created By [Anthony C. Budd](https://github.com/anthonybudd)
     <img src="https://github.com/anthonybudd/Camera-Spike/raw/master/docs/img/screenshot.png?v=2" width="500" alt="screenshot">
 </p>
 
-The web UI is just [a single .html file]() with only two local dependencies Vue.js and Axios. This simplicity and minimalism is by design, allowing the user to easily audit the code. Currently there is only basic auth implemented on the route to request the frames for a specific day, the endpoints for returning the actual image data and the HTML for the web UI are not secured. I will address this in a later version, however the onion address does provide some _secuirity by obscurity_.
+The web UI is just [a single .html file](https://github.com/anthonybudd/Camera-Spike/blob/master/src/ui/index.html) with only two local dependencies Vue.js and Axios. This simplicity and minimalism is by design, allowing the user to easily audit the code. Currently there is only basic auth implemented on the route to request the frames for a specific day, the endpoints for returning the actual image data and the HTML for the web UI are not secured. I will address this in a later version, however the onion address does provide some _secuirity by obscurity_.
 
 
 ## Set-up
@@ -21,14 +21,19 @@ cd Camera-Spike
 ./install.sh
 cp .env.example .env
 
-sed -i "" "s#USERNAME=.*#USERNAME=u$(openssl rand -hex 5)#" .env
-sed -i "" "s#PASSWORD=.*#PASSWORD=$(openssl rand -hex 15)#" .env
+# Set USERNAME and PASSWORD
+sed -i "" "s#USERNAME=.*#USERNAME='u$(openssl rand -hex 5)'#" .env
+sed -i "" "s#PASSWORD=.*#PASSWORD='$(openssl rand -hex 15)'#" .env
+cat .env | grep 'USERNAME\|PASSWORD'
+
+sed -i '' 's#eUSERNAME=.*#USERNAME='u$(openssl rand -hex 5)'#g' .env
 
 # Create Onion Address
+docker-compose build
 docker run -ti --entrypoint="mkp224o" -v $(pwd):/tor nginx-tor-proxy_nginx-tor-proxy -n 1 -S 10 -d /tor ^cs 
 mv *.onion web
 chmod 700 web
-sed -ie 's#xxxxx.onion#'"$(cat web/hostname)"'#g' nginx/tor.conf
+sed -ie 's#xxxxx.onion#'"$(cat web/hostname)"'#g' nginx-tor-proxy/nginx/tor.conf
 cat web/hostname
 
 

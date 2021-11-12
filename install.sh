@@ -9,21 +9,27 @@ echo "                                             /_/                  "
 echo ""
 echo ""
 
+sudo apt-get update && sudo apt-get upgrade
 
-# # Docker
+# Docker
 curl -sSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
 
-# # Docker Compose
+# Docker Compose
 sudo apt-get install -y libffi-dev libssl-dev
 sudo apt-get install -y python3 python3-pip
 sudo apt-get remove python-configparser
-sudo pip3 -v install docker-compose
+sudo pip3 install docker-compose
 sudo chmod a+x /usr/local/bin/docker-compose
 
 # Auto-start Docker
-# systemctl enable /opt/docker-compose/docker-compose.service
+sudo systemctl enable docker
 
 # nginx-tor-proxy tweaks
-git clone https://github.com:anthonybudd/nginx-tor-proxy.git
-sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf 
+git clone https://github.com/anthonybudd/nginx-tor-proxy.git
+sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf
+
+sudo chown -R $USER .
+sudo usermod -aG docker $USER
+# sudo chown root:docker /var/run/docker.sock
+# sudo chown -R root:docker /var/run/docker
+docker version
