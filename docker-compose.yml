@@ -3,12 +3,12 @@ version: '3.1'
 services:
     camera-spike:
         build: .
-        entrypoint: "nodemon /app/src/index.js --watch /app --legacy-watch"
+        # entrypoint: "nodemon /app/src/index.js --watch /app --legacy-watch"
         restart: always
         container_name: camera-spike
         volumes:
             - ${MEDIA_PATH}:/frames
-            - ./:/app
+            # - ./:/app
         environment:
             USERNAME: ${USERNAME}
             PASSWORD: ${PASSWORD}

@@ -9,7 +9,10 @@ echo "                                             /_/                  "
 echo ""
 echo ""
 
-sudo apt-get update && sudo apt-get upgrade
+
+# Update
+sudo apt-get -y update
+sudo apt-get -y upgrade
 
 # Docker
 curl -sSL https://get.docker.com | sh
@@ -30,6 +33,6 @@ sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf
 
 sudo chown -R $USER .
 sudo usermod -aG docker $USER
-# sudo chown root:docker /var/run/docker.sock
-# sudo chown -R root:docker /var/run/docker
-docker version
+sudo chown $USER /var/run/docker.sock
+docker-compose build
+sudo chown -R $USER .

@@ -2,7 +2,7 @@
     <img src="https://github.com/anthonybudd/camera-spike/raw/master/docs/img/header.png" alt="Header">
 </p>
 
-Camera Spike is a basic self-hosted security camera project for the Raspberry Pi. A web UI is proxied over Tor to using [anthonybudd/nginx-tor-proxy](https://github.com/anthonybudd/nginx-tor-proxy), this allows you to remotely monitor the feed without needing to register the device with a 3rd-party or without disclosing your IP address or the IP address of the Camera Spike. CLI tools are provided so you can easily create a custom Onion v3 Address using [cathugger/mkp224o](https://github.com/cathugger/mkp224o).
+Camera Spike is a basic self-hosted security camera project for the Raspberry Pi. A web UI is proxied over Tor using [anthonybudd/nginx-tor-proxy](https://github.com/anthonybudd/nginx-tor-proxy), this allows you to remotely monitor the feed without needing to register the device with a 3rd-party or without disclosing your IP address or the IP address of the Camera Spike. CLI tools are provided so you can easily create a custom Onion v3 address using [cathugger/mkp224o](https://github.com/cathugger/mkp224o).
 
 Created By [Anthony C. Budd](https://github.com/anthonybudd)
 
@@ -15,6 +15,8 @@ The web UI is just [a single .html file](https://github.com/anthonybudd/Camera-S
 
 
 ## Set-up
+It is recommended that you use a fresh installation of Raspberry Pi OS. You will need to manually enable the camera by clicking on `Main Menu -> Preferences -> Raspberry Pi Configuration -> Interfaces`
+
 ```sh
 git clone git@github.com:anthonybudd/Camera-Spike.git
 cd Camera-Spike
@@ -26,16 +28,14 @@ sed -i "" "s#USERNAME=.*#USERNAME='u$(openssl rand -hex 5)'#" .env
 sed -i "" "s#PASSWORD=.*#PASSWORD='$(openssl rand -hex 15)'#" .env
 cat .env | grep 'USERNAME\|PASSWORD'
 
-sed -i '' 's#eUSERNAME=.*#USERNAME='u$(openssl rand -hex 5)'#g' .env
-
 # Create Onion Address
 docker-compose build
 docker run -ti --entrypoint="mkp224o" -v $(pwd):/tor nginx-tor-proxy_nginx-tor-proxy -n 1 -S 10 -d /tor ^cs 
-mv *.onion web
 chmod 700 web
+mv *.onion nginx-tor-proxy/web
+sudo chown -R root nginx-tor-proxy
 sed -ie 's#xxxxx.onion#'"$(cat web/hostname)"'#g' nginx-tor-proxy/nginx/tor.conf
 cat web/hostname
-
 
 ./start.sh
 ```

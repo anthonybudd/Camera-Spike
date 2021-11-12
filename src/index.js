@@ -65,7 +65,7 @@ app.get('/api/v1/frames/:year/:month/:day', [ basicAuth({ users })], async (req,
             files = files
                 .filter((f) => (extractUnix(f) > after))
                 .sort((a, b) => (a > b))
-                .slice(0, count);
+                .slice(-count);
         } else if (before) {
             files = files
                 .filter((f) => (extractUnix(f) < before))

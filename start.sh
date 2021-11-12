@@ -30,16 +30,16 @@ echo ""
 # Start Web UI and Tor
 echo "> Starting Web Server"
 docker-compose up -d
+echo ""
 
 
 # Main loop that captures images
 echo "> Capturing Frames"
-echo ""
 while :
 do
     mkdir -p $MEDIA_PATH/$(date +"%Y/%m/%d")
     export IMAGE_PATH=$MEDIA_PATH/$(date +"%Y/%m/%d")/frame-$(date +"%H-%M-%S")--$(date +"%s").jpg
-    raspistill -n -t 1 -o $IMAGE_PATH
+    raspistill -n -t 1 -o $IMAGE_PATH --width $IMAGE_WIDTH --height $IMAGE_HEIGHT
     echo $IMAGE_PATH
     sleep $CAMERA_TIMEOUT
 done

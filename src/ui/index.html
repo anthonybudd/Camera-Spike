@@ -58,25 +58,27 @@
                 </div>
 
                 <div class="col-md-1">
-                    <button @click="previous" type="button" class="btn btn-primary btn-lg">
+                    <button @click="previous" type="button" class="btn btn-primary btn-lg h-100">
                         Previous
                     </button>
                 </div>
 
                 <div class="col-md-10">
-                    <div class="container frames-group">
-                        <div class="row text-center" id="framesGroup">
-                            <div v-for="frame in frames" :key="frame" class="frame col-2">
-                                <img @click="setFrame(frame)" :src="frame" class="img-fluid" alt="">
-                                <h4 v-if="frame === mainImage">{{ frame | extractTime }}</h4>
-                                <p v-else>{{ frame | extractTime }}</p>
+                    <div class="card rounded-3"></div>
+                        <div class="container frames-group">
+                            <div class="row text-center" id="framesGroup">
+                                <div v-for="frame in frames" :key="frame" class="frame col-2">
+                                    <img @click="setFrame(frame)" :src="frame" class="img-fluid" alt="">
+                                    <h4 v-if="frame === mainImage">{{ frame | extractTime }}</h4>
+                                    <p v-else>{{ frame | extractTime }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-1">
-                    <button @click="next" type="button" class="btn btn-primary btn-lg">
+                    <button @click="next" type="button" class="btn btn-primary btn-lg h-100">
                         Update
                     </button>
                 </div>
