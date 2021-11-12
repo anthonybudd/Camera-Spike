@@ -5,19 +5,6 @@
     <script src="/static/vue.js"></script>
     <script src="/static/axios.min.js"></script>
     <link href="/static/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .frames-group > .row {
-            display: block;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-        .frames-group > .row > .col-1 {
-            display: inline-block;
-        }
-        .frame img {
-            cursor: pointer;
-        }
-    </style>
 </head>
 
 <body>
@@ -25,17 +12,49 @@
         <header>
             <div class="navbar navbar-dark bg-dark shadow-sm">
                 <div class="container">
-                    <a href="#" class="navbar-brand d-flex align-items-center">
-                        <strong>Camera Spike</strong>
-                    </a>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <a href="https://github.com/anthonybudd/camera-spike" class="navbar-brand d-flex align-items-center">
+                                <strong>Camera Spike</strong>
+                            </a>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Day" aria-label="Day" v-model="day">
+                                <input type="text" class="form-control" placeholder="Month" aria-label="Month" v-model="month">
+                                <input type="text" class="form-control" placeholder="Year" aria-label="Year" v-model="year">
+                                <button class="btn btn-primary" type="button" @click="load" v-if="isLoggedIn">Go</button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Username" aria-label="Username" v-model="username" v-on:keyup.enter="load">
+                                <input type="password" class="form-control" placeholder="Password" aria-label="Password" v-model="password" v-on:keyup.enter="load">
+                                <button class="btn btn-primary" type="button" @click="load">Login</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <section class="container container-fluid">
-            <div class="row mb-4">
+        <section class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 mt-4 d-flex justify-content-center">
+                    <div class="alert alert-secondary" role="alert" v-if="!isLoggedIn">
+                        Please Login
+                    </div>
+
+                    <div class="alert alert-secondary" role="alert" v-else-if="frames.length === 0">
+                        No Images
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4" v-if="frames.length > 0">
                 <div class="col-md-12 text-center mb-4">
-                    <img style="height:500px" :src="mainImage" />
+                    <h1>{{imageTitle}}</h1>
+                    <img style="height:500px" v-if="mainImage" :src="mainImage" />
                 </div>
 
                 <div class="col-md-1">
@@ -46,9 +65,11 @@
 
                 <div class="col-md-10">
                     <div class="container frames-group">
-                        <div class="row text-center">
-                            <div v-for="frame in frames" :key="frame" class="frame col-1">
-                                <img @click="setFrame(frame)" :src="frame" class="w-100" alt="">
+                        <div class="row text-center" id="framesGroup">
+                            <div v-for="frame in frames" :key="frame" class="frame col-2">
+                                <img @click="setFrame(frame)" :src="frame" class="img-fluid" alt="">
+                                <h4 v-if="frame === mainImage">{{ frame | extractTime }}</h4>
+                                <p v-else>{{ frame | extractTime }}</p>
                             </div>
                         </div>
                     </div>
@@ -56,46 +77,110 @@
 
                 <div class="col-md-1">
                     <button @click="next" type="button" class="btn btn-primary btn-lg">
-                        Next
+                        Update
                     </button>
                 </div>
-            </div>
+            </div> 
         </section>
+        
     </div>
 
     <script>
         var app = new Vue({
             el: '#app',
-            data(){
+            data() {
                 return {
+                    isLoggedIn: false,
                     day: (new Date().getDate()),
-                    month: (new Date().getMonth()+1),
+                    month: (new Date().getMonth() + 1),
                     year: (new Date().getFullYear()),
                     currentTimestamp: Math.floor(Date.now() / 1000),
-                    mainImage: '',
+                    mainImage: false,
                     frames: [],
+                    username: '',
+                    password: '',
+                    months: [
+                        'January',
+                        'February',
+                        'March',
+                        'April',
+                        'May',
+                        'June',
+                        'July',
+                        'August',
+                        'September',
+                        'October',
+                        'November',
+                        'December',
+                    ],
                 }
             },
+            filters: {
+                extractTime(str) {
+                    if (!str) return '';
+                    return str.split('frame-')[1].substring(0, 8).replaceAll('-', ':');
+                }
+            },
+            computed: {
+                imageTitle() {
+                    if (!this.mainImage) return '';
+                    const time = this.mainImage.split('frame-')[1].substring(0, 8).replaceAll('-', ':');
+                    return `${this.day} ${this.months[new Date().getMonth()]} ${this.year} ${time}`;
+                },
+            },
             async mounted() {
-                const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
-                    params: {
-                        before: this.currentTimestamp
-                    }
-                });
-
-                const extractUnix = (filePath) => (Number(filePath.split('--')[1].split('.')[0]));
-
-                this.frames = frames.map((f) => (`/api/v1/frames/${this.year}/${this.month}/${this.day}/${extractUnix(f)}`));
                 
-                let lastFrame = this.frames[this.frames.length-1];
-                if (lastFrame) this.mainImage = lastFrame;
             },
             methods: {
-                previous() {
-                    alert('Previous')
+                async load() {
+                    const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
+                        params: {
+                            before: this.currentTimestamp
+                        },
+                        auth: {
+                            username: this.username,
+                            password: this.password
+                        }
+                    });
+
+                    this.frames = frames;
+                    
+                    const lastFrame = this.frames[this.frames.length - 1];
+                    if (lastFrame) this.mainImage = lastFrame;
+                    this.isLoggedIn = true;
+
+                    Vue.nextTick(() => (document.querySelector('#framesGroup').scrollLeft = 999999));
+
                 },
-                next() {
-                    alert('next')
+                async previous() {
+                    const before = this.frames[0].replace('.jpg', '').split('--')[1];
+
+                    const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
+                        params: {
+                            before
+                        },
+                        auth: {
+                            username: this.username,
+                            password: this.password
+                        }
+                    });
+
+                    this.frames.unshift(...frames);
+                },
+                async next() {
+                    const after = this.frames[this.frames.length - 1].replace('.jpg', '').split('--')[1];
+
+                    const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
+                        params: {
+                            after
+                        },
+                        auth: {
+                            username: this.username,
+                            password: this.password
+                        }
+                    });
+
+                    this.frames.push(...frames);
                 },
                 setFrame(frame) {
                     this.mainImage = frame;

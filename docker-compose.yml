@@ -9,6 +9,9 @@ services:
         volumes:
             - ${MEDIA_PATH}:/frames
             - ./:/app
+        environment:
+            USERNAME: ${USERNAME}
+            PASSWORD: ${PASSWORD}
         ports:
             - 8000:80
 
