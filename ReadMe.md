@@ -2,7 +2,7 @@
     <img src="https://github.com/anthonybudd/camera-spike/raw/master/docs/img/header.png" alt="Header">
 </p>
 
-Camera Spike is a very basic self-hosted security camera project for the Raspberry Pi. A web UI is proxied over Tor over to using [anthonybudd/nginx-tor-proxy](https://github.com/anthonybudd/nginx-tor-proxy), this allows you to remotely monitor the feed without needing to register the device with a 3rd-party or without disclosing your IP address or the IP address of the Camera Spike. CLI tools are provided so you can easily create a custom Onion v3 Address using [cathugger/mkp224o](https://github.com/cathugger/mkp224o).
+Camera Spike is a basic self-hosted security camera project for the Raspberry Pi. A web UI is proxied over Tor to using [anthonybudd/nginx-tor-proxy](https://github.com/anthonybudd/nginx-tor-proxy), this allows you to remotely monitor the feed without needing to register the device with a 3rd-party or without disclosing your IP address or the IP address of the Camera Spike. CLI tools are provided so you can easily create a custom Onion v3 Address using [cathugger/mkp224o](https://github.com/cathugger/mkp224o).
 
 Created By [Anthony C. Budd](https://github.com/anthonybudd)
 
@@ -10,6 +10,8 @@ Created By [Anthony C. Budd](https://github.com/anthonybudd)
 <p align="center">
     <img src="https://github.com/anthonybudd/Camera-Spike/raw/master/docs/img/screenshot.png?v=2" width="500" alt="screenshot">
 </p>
+
+The web UI is just [a single .html file]() with only two local dependencies Vue.js and Axios. This simplicity and minimalism is by design, allowing the user to easily audit the code. Currently there is only basic auth implemented on the route to request the frames for a specific day, the endpoints for returning the actual image data and the HTML for the web UI are not secured. I will address this in a later version, however the onion address does provide some _secuirity by obscurity_.
 
 
 ## Set-up
@@ -19,12 +21,16 @@ cd Camera-Spike
 ./install.sh
 cp .env.example .env
 
+sed -i "" "s#USERNAME=.*#USERNAME=u$(openssl rand -hex 5)#" .env
+sed -i "" "s#PASSWORD=.*#PASSWORD=$(openssl rand -hex 15)#" .env
+
 # Create Onion Address
 docker run -ti --entrypoint="mkp224o" -v $(pwd):/tor nginx-tor-proxy_nginx-tor-proxy -n 1 -S 10 -d /tor ^cs 
 mv *.onion web
 chmod 700 web
 sed -ie 's#xxxxx.onion#'"$(cat web/hostname)"'#g' nginx/tor.conf
 cat web/hostname
+
 
 ./start.sh
 ```
