@@ -8,7 +8,7 @@ Created By [Anthony C. Budd](https://github.com/anthonybudd)
 
 
 <p align="center">
-    <img src="https://github.com/anthonybudd/Camera-Spike/raw/master/docs/img/screenshot.png" width="500" alt="screenshot">
+    <img src="https://github.com/anthonybudd/Camera-Spike/raw/master/docs/img/screenshot.png?v=2" width="500" alt="screenshot">
 </p>
 
 
