@@ -1,8 +1,8 @@
 <p align="center">
-<img src="https://github.com/anthonybudd/camera-spike/raw/master/docs/img/header.png" alt="Header">
+    <img src="https://github.com/anthonybudd/camera-spike/raw/master/docs/img/header.png" alt="Header">
 </p>
 
-Camera Spike is a very basic self-hosted security camera project for the Raspberry Pi. A web UI is that is proxised over to using [anthonybudd/nginx-tor-proxy](https://github.com/anthonybudd/nginx-tor-proxy), this allows you to remotely monitor the feed without needing to register the device with a 3rd-party or without disclosing your IP address or the IP address of the Camera Spike. CLI tools are provided so you can easily create a custom Onion v3 Address using [cathugger/mkp224o](https://github.com/cathugger/mkp224o).
+Camera Spike is a very basic self-hosted security camera project for the Raspberry Pi. A web UI is proxied over Tor over to using [anthonybudd/nginx-tor-proxy](https://github.com/anthonybudd/nginx-tor-proxy), this allows you to remotely monitor the feed without needing to register the device with a 3rd-party or without disclosing your IP address or the IP address of the Camera Spike. CLI tools are provided so you can easily create a custom Onion v3 Address using [cathugger/mkp224o](https://github.com/cathugger/mkp224o).
 
 Created By [Anthony C. Budd](https://github.com/anthonybudd)
 
