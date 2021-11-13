@@ -22,7 +22,7 @@ git clone git@github.com:anthonybudd/Camera-Spike.git
 cd Camera-Spike
 ./install.sh # Installs docker, docker-compose and clones anthonybudd/nginx-tor-proxy
 cp .env.example .env
-echo "$(pwd)/start.sh" >> /etc/rc.local
+echo "$(pwd)/start.sh" >> /etc/rc.local # run ./start.sh on boots
 
 # Set USERNAME and PASSWORD
 sed -ie 's#USERNAME=.*#USERNAME='"u$(openssl rand -hex 5)"'#g' .env
@@ -32,12 +32,12 @@ cat .env | grep 'USERNAME\|PASSWORD' # This is your random username and password
 # Create Onion Address
 docker-compose build
 docker run -ti --entrypoint="mkp224o" -v $(pwd):/tor nginx-tor-proxy_nginx-tor-proxy -n 1 -S 10 -d /tor ^cs 
-chmod 700 web
 mv *.onion nginx-tor-proxy/web
 sudo chown -R root nginx-tor-proxy
+chmod 700 nginx-tor-proxy/web
 sed -ie 's#xxxxx.onion#'"$(cat web/hostname)"'#g' nginx-tor-proxy/nginx/tor.conf
 sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf
-cat web/hostname # This is the onion address of the Camera Spike
+cat nginx-tor-proxy/web/hostname # This is the onion address of the Camera Spike
 
 ./start.sh
 ```
