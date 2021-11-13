@@ -29,10 +29,8 @@ sudo systemctl enable docker
 
 # nginx-tor-proxy tweaks
 git clone https://github.com/anthonybudd/nginx-tor-proxy.git
-sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf
 
-sudo chown -R $USER .
+# Permissions
 sudo usermod -aG docker $USER
 sudo chown $USER /var/run/docker.sock
-docker-compose build
-sudo chown -R $USER .
+# sudo chown -R $USER .

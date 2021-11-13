@@ -20,13 +20,14 @@ It is recommended that you use a fresh installation of Raspberry Pi OS. You will
 ```sh
 git clone git@github.com:anthonybudd/Camera-Spike.git
 cd Camera-Spike
-./install.sh
+./install.sh # Installs docker, docker-compose and clones anthonybudd/nginx-tor-proxy
 cp .env.example .env
+echo "$(pwd)/start.sh" >> /etc/rc.local
 
 # Set USERNAME and PASSWORD
-sed -i "" "s#USERNAME=.*#USERNAME='u$(openssl rand -hex 5)'#" .env
-sed -i "" "s#PASSWORD=.*#PASSWORD='$(openssl rand -hex 15)'#" .env
-cat .env | grep 'USERNAME\|PASSWORD'
+sed -ie 's#USERNAME=.*#USERNAME='"u$(openssl rand -hex 5)"'#g' .env
+sed -ie 's#PASSWORD=.*#PASSWORD='"u$(openssl rand -hex 15)"'#g' .env
+cat .env | grep 'USERNAME\|PASSWORD' # This is your random username and password
 
 # Create Onion Address
 docker-compose build
@@ -35,10 +36,13 @@ chmod 700 web
 mv *.onion nginx-tor-proxy/web
 sudo chown -R root nginx-tor-proxy
 sed -ie 's#xxxxx.onion#'"$(cat web/hostname)"'#g' nginx-tor-proxy/nginx/tor.conf
-cat web/hostname
+sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf
+cat web/hostname # This is the onion address of the Camera Spike
 
 ./start.sh
 ```
+
+You will see that the command to create and onion address has `^cs` at the end. This argument is used to create a vanity onion address, this will create an onion address that starts with `cs` so the full onion address will look like `csw6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd.onion`. See [this](https://github.com/cathugger/mkp224o/blob/74a13ae5c0ecd26c5bca8ea35edb00a649719ff2/main.c#L400) for more info on the [mkp224o](https://github.com/cathugger/mkp224o) arguments.
 
 ## Hardware
 <p align="center">
@@ -51,7 +55,7 @@ cat web/hostname
 
 
 ### USB Storage
-By default Camera Spike will save all frames to `/home/pi/Camera-Spike` you can change this by modifying the `MEDIA_PATH` variable in the .env file. However I recommend that you use USB storage. 
+By default Camera Spike will save all frames to `/home/pi/Camera-Spike/images` you can change this by modifying the `MEDIA_PATH` variable in the .env file. However I recommend that you use USB storage. 
 
 To auto-mount a USB flash drive to a specific path run the following commands.
 ```
@@ -68,3 +72,8 @@ nano .env
 
 ## ToDo
 - Auth For Images
+- Auto Refresh
+- Loading Spinners
+- Add count to header
+- Time Select
+- Load latest and load next button
