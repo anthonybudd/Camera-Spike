@@ -18,16 +18,16 @@ The web UI is just [a single .html file](https://github.com/anthonybudd/Camera-S
 It is recommended that you use a fresh installation of Raspberry Pi OS. You will need to manually enable the camera by clicking on `Main Menu -> Preferences -> Raspberry Pi Configuration -> Interfaces`
 
 ```sh
-git clone git@github.com:anthonybudd/Camera-Spike.git
+git clone https://github.com/anthonybudd/Camera-Spike.git
 cd Camera-Spike
 ./install.sh # Installs docker, docker-compose and clones anthonybudd/nginx-tor-proxy
 cp .env.example .env
-echo "$(pwd)/start.sh" >> /etc/rc.local # run ./start.sh on boots
+sudo crontab -e # @reboot bash /home/pi/Camera-Spike/start.sh
 
 # Set USERNAME and PASSWORD
 sed -ie 's#USERNAME=.*#USERNAME='"u$(openssl rand -hex 5)"'#g' .env
-sed -ie 's#PASSWORD=.*#PASSWORD='"u$(openssl rand -hex 15)"'#g' .env
-cat .env | grep 'USERNAME\|PASSWORD' # This is your random username and password
+sed -ie 's#PASSWORD=.*#PASSWORD='"$(openssl rand -hex 15)"'#g' .env
+cat .env | grep 'USERNAME\|PASSWORD' # This is your username and password
 
 # Create Onion Address
 docker-compose build
@@ -42,7 +42,7 @@ cat nginx-tor-proxy/web/hostname # This is the onion address of the Camera Spike
 ./start.sh
 ```
 
-You will see that the command to create and onion address has `^cs` at the end. This argument is used to create a vanity onion address, this will create an onion address that starts with `cs` so the full onion address will look like `csw6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd.onion`. See [this](https://github.com/cathugger/mkp224o/blob/74a13ae5c0ecd26c5bca8ea35edb00a649719ff2/main.c#L400) for more info on the [mkp224o](https://github.com/cathugger/mkp224o) arguments.
+You will see that the command to create an onion address has `^cs` at the end. This argument is used to create a vanity onion address, this will create an onion address that starts with `cs` so the full onion address will look like `csw6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd.onion`. See [this](https://github.com/cathugger/mkp224o/blob/74a13ae5c0ecd26c5bca8ea35edb00a649719ff2/main.c#L400) for more info on the [mkp224o](https://github.com/cathugger/mkp224o) arguments.
 
 ## Hardware
 <p align="center">
@@ -62,11 +62,9 @@ To auto-mount a USB flash drive to a specific path run the following commands.
 sudo apt-get install -y exfat-fuse ntfs-3g
 sudo lsblk -o UUID,NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL,MODEL
 
-nano /etc/fstab
-# Add: "UUID=XXXX-XXXX /mnt/camera-spike-usb exfat defaults,uid=1000,gid=1000 0 0"
+nano /etc/fstab # Add line "UUID=XXXX-XXXX /mnt/camera-spike-usb exfat defaults,uid=1000,gid=1000 0 0"
 
-nano .env
-# Edit: "MEDIA_PATH=/mnt/camera-spike-usb"
+nano .env # Edit "MEDIA_PATH=/mnt/camera-spike-usb"
 ```
 
 
