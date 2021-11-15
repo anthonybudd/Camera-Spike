@@ -11,8 +11,8 @@ echo ""
 
 
 # Update
-sudo apt-get -y update
 sudo apt-get -y upgrade
+sudo apt-get -y update
 
 # Docker
 curl -sSL https://get.docker.com | sh

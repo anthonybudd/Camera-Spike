@@ -25,8 +25,8 @@ cp .env.example .env
 sudo crontab -e # @reboot bash /home/pi/Camera-Spike/start.sh
 
 # Set USERNAME and PASSWORD
-sed -ie 's#USERNAME=.*#USERNAME='"u$(openssl rand -hex 5)"'#g' .env
-sed -ie 's#PASSWORD=.*#PASSWORD='"$(openssl rand -hex 15)"'#g' .env
+sed -ie 's#USERNAME=.*#USERNAME="'u$(openssl rand -hex 5)'"#g' .env
+sed -ie 's#PASSWORD=.*#PASSWORD="'$(openssl rand -hex 15)'"#g' .env
 cat .env | grep 'USERNAME\|PASSWORD' # This is your username and password
 
 # Create Onion Address
