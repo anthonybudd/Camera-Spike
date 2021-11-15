@@ -55,7 +55,7 @@ You will see that the command to create and onion address has `^cs` at the end. 
 
 
 ### USB Storage
-By default Camera Spike will save all frames to `/home/pi/Camera-Spike/images` you can change this by modifying the `MEDIA_PATH` variable in the .env file. However I recommend that you use USB storage. 
+By default Camera Spike will save all frames to `./images` you can change this by modifying the `MEDIA_PATH` variable in the .env file. However I recommend that you use USB storage. 
 
 To auto-mount a USB flash drive to a specific path run the following commands.
 ```
@@ -73,7 +73,4 @@ nano .env
 ## ToDo
 - Auth For Images
 - Auto Refresh
-- Loading Spinners
 - Add count to header
-- Time Select
-- Load latest and load next button

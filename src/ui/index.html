@@ -18,13 +18,28 @@
                                 <strong>Camera Spike</strong>
                             </a>
                         </div>
-                        <div class="col-md-7">
+                        <div class="col-md-3">
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="Day" aria-label="Day" v-model="day">
                                 <input type="text" class="form-control" placeholder="Month" aria-label="Month" v-model="month">
                                 <input type="text" class="form-control" placeholder="Year" aria-label="Year" v-model="year">
                                 <button class="btn btn-primary" type="button" @click="load" v-if="isLoggedIn">Go</button>
                             </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Hour" aria-label="Hour" v-model="hour">
+                                <input type="text" class="form-control" placeholder="Minute" aria-label="Minute" v-model="minute">
+                                <button class="btn btn-primary" type="button" @click="loadTime" v-if="isLoggedIn">Go</button>
+                            </div>
+                        </div>
+                        <div class="col-md-2 pt-2">
+                            <!-- <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="autorefresh" v-model="autoRefresh">
+                                <label class="form-check-label text-white" for="autorefresh">
+                                    Auto Refresh
+                                </label>
+                            </div> -->
                         </div>
                         <div class="col-md-3">
                             <div class="input-group">
@@ -58,13 +73,16 @@
                 </div>
 
                 <div class="col-md-1">
-                    <button @click="previous" type="button" class="btn btn-primary btn-lg h-100">
-                        Previous
+                    <button @click="previous" type="button" class="btn btn-primary btn-lg h-100 w-100">
+                        <span v-if="!isLoading">Previous</span>
+                        <div v-else class="lds-ring">
+                            <div></div><div></div><div></div><div></div>
+                        </div>
                     </button>
                 </div>
 
                 <div class="col-md-10">
-                    <div class="card rounded-3"></div>
+                    <div class="card rounded-3">
                         <div class="container frames-group">
                             <div class="row text-center" id="framesGroup">
                                 <div v-for="frame in frames" :key="frame" class="frame col-2">
@@ -78,8 +96,11 @@
                 </div>
 
                 <div class="col-md-1">
-                    <button @click="next" type="button" class="btn btn-primary btn-lg h-100">
-                        Update
+                    <button @click="next" type="button" class="btn btn-primary btn-lg h-100 w-100">
+                        <span v-if="!isLoading">Next</span>   
+                        <div v-else class="lds-ring">
+                            <div></div><div></div><div></div><div></div>
+                        </div>
                     </button>
                 </div>
             </div> 
@@ -93,6 +114,11 @@
             data() {
                 return {
                     isLoggedIn: false,
+                    isLoading: false,
+                    autoRefresh: false,
+                    autoRefresh_: null,
+                    hour: (new Date().getHours()),
+                    minute: (new Date().getMinutes()),
                     day: (new Date().getDate()),
                     month: (new Date().getMonth() + 1),
                     year: (new Date().getFullYear()),
@@ -135,56 +161,102 @@
             },
             methods: {
                 async load() {
-                    const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
-                        params: {
-                            before: this.currentTimestamp
-                        },
-                        auth: {
-                            username: this.username,
-                            password: this.password
-                        }
-                    });
+                    try {
+                        this.isLoading = true;
+                        const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
+                            params: {
+                                before: this.currentTimestamp
+                            },
+                            auth: {
+                                username: this.username,
+                                password: this.password
+                            }
+                        });
 
-                    this.frames = frames;
-                    
-                    const lastFrame = this.frames[this.frames.length - 1];
-                    if (lastFrame) this.mainImage = lastFrame;
-                    this.isLoggedIn = true;
+                        this.frames = frames;
+                        
+                        const lastFrame = this.frames[this.frames.length - 1];
+                        if (lastFrame) this.mainImage = lastFrame;
+                        this.isLoggedIn = true;
+                        Vue.nextTick(() => (document.querySelector('#framesGroup').scrollLeft = 999999));
+                    } catch (error) {
+                        console.error(error)
+                    } finally {
+                        this.isLoading = false;
+                    }
+                },
+                async loadTime() {
+                    try {
+                        this.isLoading = trues;
+                        const unix = Math.floor(new Date(this.year, (this.month-1), this.day, this.hour, this.minute, 0) / 1000);
 
-                    Vue.nextTick(() => (document.querySelector('#framesGroup').scrollLeft = 999999));
+                        const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}/unix/${unix}`, {
+                            auth: {
+                                username: this.username,
+                                password: this.password
+                            }
+                        });
 
+                        this.frames = frames;
+                        
+                        const lastFrame = this.frames[this.frames.length - 1];
+                        if (lastFrame) this.mainImage = lastFrame;
+                        this.isLoggedIn = true;
+                        Vue.nextTick(() => (document.querySelector('#framesGroup').scrollLeft = 999999));
+                    } catch (error) {
+                        console.error(error)
+                    } finally {
+                        this.isLoading = false;
+                    }
                 },
                 async previous() {
-                    const before = this.frames[0].replace('.jpg', '').split('--')[1];
+                    try {
+                        this.isLoading = true;
+                        const before = this.frames[0].replace('.jpg', '').split('--')[1];
 
-                    const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
-                        params: {
-                            before
-                        },
-                        auth: {
-                            username: this.username,
-                            password: this.password
-                        }
-                    });
+                        const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
+                            params: {
+                                before
+                            },
+                            auth: {
+                                username: this.username,
+                                password: this.password
+                            }
+                        });
 
-                    this.frames.unshift(...frames);
+                        this.frames.unshift(...frames);
+                        Vue.nextTick(() => (document.querySelector('#framesGroup').scrollLeft = 0));
+                    } catch (error) {
+                        console.error(error)
+                    } finally {
+                        this.isLoading = false;
+                    }
                 },
                 async next() {
-                    const after = this.frames[this.frames.length - 1].replace('.jpg', '').split('--')[1];
+                    try {
+                        const after = this.frames[this.frames.length - 1].replace('.jpg', '').split('--')[1];
 
-                    const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
-                        params: {
-                            after
-                        },
-                        auth: {
-                            username: this.username,
-                            password: this.password
-                        }
-                    });
+                        const { data: frames } = await axios.get(`/api/v1/frames/${this.year}/${this.month}/${this.day}`, {
+                            params: {
+                                after
+                            },
+                            auth: {
+                                username: this.username,
+                                password: this.password
+                            }
+                        });
 
-                    this.frames.push(...frames);
+                        this.frames.push(...frames);
+                        Vue.nextTick(() => (document.querySelector('#framesGroup').scrollLeft = 999999));
+                    } catch (error) {
+                        console.error(error)
+                    } finally {
+                        this.isLoading = false;
+                    }
                 },
                 setFrame(frame) {
+                    // hour
+                    // minutes
                     this.mainImage = frame;
                 }
             }

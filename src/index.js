@@ -28,8 +28,11 @@ app.get('/_readiness', (req, res) => res.send('healthy'))
 app.get('/api/v1/_healthcheck', (req, res) => res.json({ status: 'ok' }));
 app.use(morgan('[:date[iso]] HTTP/:http-version :status :method :url :response-time ms'));
 app.use('/static', express.static(path.join(__dirname, 'ui')));
+
 const users = {};
 users[process.env.USERNAME] = process.env.PASSWORD;
+const defaultCount = Number(process.env.DEFAULT_IM) || 10;
+const extractUnix = (filePath) => (Number(path.basename(filePath).split('--')[1].split('.')[0]));
 
 ////////////////////////////////////////////////
 // Routes
@@ -56,29 +59,27 @@ app.get('/api/v1/frames/:year/:month/:day', [ basicAuth({ users })], async (req,
     try {
         const after  = req.query.after? Number(req.query.after) : false;
         const before = req.query.before? Number(req.query.before) : false;
-        const count  = req.query.count? Number(req.query.count) : 10;
-        let files  = fs.readdirSync(`/frames/${req.params.year}/${req.params.month}/${req.params.day}`);
-
-        const extractUnix = (filePath) => (Number(path.basename(filePath).split('--')[1].split('.')[0]));
+        const count  = req.query.count? Number(req.query.count) : defaultCount;
+        let frames  = fs.readdirSync(`/frames/${req.params.year}/${req.params.month}/${req.params.day}`);
 
         if (after) {
-            files = files
+            frames = frames
                 .filter((f) => (extractUnix(f) > after))
                 .sort((a, b) => (a > b))
                 .slice(-count);
         } else if (before) {
-            files = files
+            frames = frames
                 .filter((f) => (extractUnix(f) < before))
                 .sort((a, b) => (a < b))
                 .slice(-count);
         } else {
-            files = files
+            frames = frames
                 .sort((a, b) => (a > b))
                 .slice(0, count);
         }
 
         return res.json(
-            files.map((f) => (`/api/v1/frames/${req.params.year}/${req.params.month}/${req.params.day}/${f}`))
+            frames.map((f) => (`/api/v1/frames/${req.params.year}/${req.params.month}/${req.params.day}/${f}`))
         );
     } catch (error) {
         console.error(error);
@@ -94,13 +95,13 @@ app.get('/api/v1/frames/:year/:month/:day', [ basicAuth({ users })], async (req,
  */
 app.get('/api/v1/frames/:year/:month/:day/:frame', async (req, res) => {
     try {
-        glob(`/frames/${req.params.year}/${req.params.month}/${req.params.day}/${req.params.frame}`, {}, (err, files) => {
+        glob(`/frames/${req.params.year}/${req.params.month}/${req.params.day}/${req.params.frame}`, {}, (err, frames) => {
             if (err) throw err;
 
-            const file = files[0];
-            if (!file) return res.status(404).send('Image not found');
+            const frame = frames[0];
+            if (!frame) return res.status(404).send('Image not found');
 
-            fs.readFile(file, (err, data) => {
+            fs.readFile(frame, (err, data) => {
                 if (err) throw err;  
                 res.writeHead(200, {'Content-Type': 'image/jpeg'});
                 res.end(data); 
@@ -120,18 +121,22 @@ app.get('/api/v1/frames/:year/:month/:day/:frame', async (req, res) => {
  */
 app.get('/api/v1/frames/:year/:month/:day/unix/:unix', async (req, res) => {
     try {
-        glob(`/frames/${req.params.year}/${req.params.month}/${req.params.day}/*--${req.params.unix}*`, {}, (err, files) => {
-            if (err) throw err;
+        let frames  = fs.readdirSync(`/frames/${req.params.year}/${req.params.month}/${req.params.day}`);
+        const count  = req.query.count? Number(req.query.count) : defaultCount;
+        const objective  = Number(req.params.unix);
 
-            const file = files[0];
-            if (!file) return res.status(404).send('Image not found');
+        const distanceFromObjective = (s) => (Math.abs(objective - extractUnix(s)));
 
-            fs.readFile(file, (err, data) => {
-                if (err) throw err;  
-                res.writeHead(200, {'Content-Type': 'image/jpeg'});
-                res.end(data); 
-            });
-        })
+        frames = frames
+            .map(f => ({f, d: distanceFromObjective(f) }))
+            .sort((a, b) => (a.d - b.d))
+            .map(({ f }) => (f))
+            .slice(0, count)
+            .sort((a, b) => (extractUnix(a) - extractUnix(b)));
+
+        return res.json(
+            frames.map((f) => (`/api/v1/frames/${req.params.year}/${req.params.month}/${req.params.day}/${f}`))
+        );
     } catch (error) {
         console.error(error);
         return res.status(500).send('Error');
