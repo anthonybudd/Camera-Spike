@@ -18,9 +18,8 @@ sudo apt-get -y update
 curl -sSL https://get.docker.com | sh
 
 # Docker Compose
-sudo apt-get install -y libffi-dev libssl-dev
-sudo apt-get install -y python3 python3-pip
-sudo apt-get remove python-configparser
+sudo apt-get install -y libffi-dev libssl-dev python3 python3-pip
+sudo apt-get remove -y python-configparser
 sudo pip3 install docker-compose
 sudo chmod a+x /usr/local/bin/docker-compose
 

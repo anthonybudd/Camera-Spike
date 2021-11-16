@@ -31,12 +31,13 @@ cat .env | grep 'USERNAME\|PASSWORD' # This is your username and password
 
 # Create Onion Address
 docker-compose build
-docker run -ti --entrypoint="mkp224o" -v $(pwd):/tor nginx-tor-proxy_nginx-tor-proxy -n 1 -S 10 -d /tor ^cs 
-mv *.onion nginx-tor-proxy/web
+docker run -ti --entrypoint="mkp224o" -v $(pwd):/tor camera-spike_nginx-tor-proxy -n 1 -S 10 -d /tor ^cs
+sudo chown -R $USER nginx-tor-proxy
+sudo mv *.onion nginx-tor-proxy/web
+sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf
+sed -ie 's#xxxxx.onion#'"$(cat nginx/web/hostname)"'#g' nginx-tor-proxy/nginx/tor.conf
 sudo chown -R root nginx-tor-proxy
 chmod 700 nginx-tor-proxy/web
-sed -ie 's#xxxxx.onion#'"$(cat web/hostname)"'#g' nginx-tor-proxy/nginx/tor.conf
-sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf
 cat nginx-tor-proxy/web/hostname # This is the onion address of the Camera Spike
 
 ./start.sh
