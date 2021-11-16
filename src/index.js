@@ -60,21 +60,21 @@ app.get('/api/v1/frames/:year/:month/:day', [ basicAuth({ users })], async (req,
         const after  = req.query.after? Number(req.query.after) : false;
         const before = req.query.before? Number(req.query.before) : false;
         const count  = req.query.count? Number(req.query.count) : defaultCount;
-        let frames  = fs.readdirSync(`/frames/${req.params.year}/${req.params.month}/${req.params.day}`);
+        let frames   = fs.readdirSync(`/frames/${req.params.year}/${req.params.month}/${req.params.day}`);
 
         if (after) {
             frames = frames
                 .filter((f) => (extractUnix(f) > after))
-                .sort((a, b) => (a > b))
+                .sort((a, b) => (extractUnix(a) - extractUnix(b)))
                 .slice(-count);
         } else if (before) {
             frames = frames
                 .filter((f) => (extractUnix(f) < before))
-                .sort((a, b) => (a < b))
+                .sort((a, b) => (extractUnix(a) - extractUnix(b)))
                 .slice(-count);
         } else {
             frames = frames
-                .sort((a, b) => (a > b))
+                .sort((a, b) => (extractUnix(a) - extractUnix(b)))
                 .slice(0, count);
         }
 

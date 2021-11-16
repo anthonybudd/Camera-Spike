@@ -37,7 +37,7 @@ sudo chown -R $USER nginx-tor-proxy
 sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf
 sed -ie 's#xxxxx.onion#'"$(cat nginx-tor-proxy/web/hostname)"'#g' nginx-tor-proxy/nginx/tor.conf
 sudo chown -R root nginx-tor-proxy
-chmod 700 nginx-tor-proxy/web
+sudo chmod 700 nginx-tor-proxy/web
 cat nginx-tor-proxy/web/hostname # This is the onion address of the Camera Spike
 
 ./start.sh
