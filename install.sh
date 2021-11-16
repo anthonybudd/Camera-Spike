@@ -32,4 +32,3 @@ git clone https://github.com/anthonybudd/nginx-tor-proxy.git
 # Permissions
 sudo usermod -aG docker $USER
 sudo chown $USER /var/run/docker.sock
-# sudo chown -R $USER .

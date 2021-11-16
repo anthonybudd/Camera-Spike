@@ -32,10 +32,10 @@ cat .env | grep 'USERNAME\|PASSWORD' # This is your username and password
 # Create Onion Address
 docker-compose build
 docker run -ti --entrypoint="mkp224o" -v $(pwd):/tor camera-spike_nginx-tor-proxy -n 1 -S 10 -d /tor ^cs
-sudo chown -R $USER nginx-tor-proxy
 sudo mv *.onion nginx-tor-proxy/web
+sudo chown -R $USER nginx-tor-proxy
 sed -ie 's#example-app#'"camera-spike"'#g' nginx-tor-proxy/nginx/tor.conf
-sed -ie 's#xxxxx.onion#'"$(cat nginx/web/hostname)"'#g' nginx-tor-proxy/nginx/tor.conf
+sed -ie 's#xxxxx.onion#'"$(cat nginx-tor-proxy/web/hostname)"'#g' nginx-tor-proxy/nginx/tor.conf
 sudo chown -R root nginx-tor-proxy
 chmod 700 nginx-tor-proxy/web
 cat nginx-tor-proxy/web/hostname # This is the onion address of the Camera Spike
@@ -63,7 +63,7 @@ To auto-mount a USB flash drive to a specific path run the following commands.
 sudo apt-get install -y exfat-fuse ntfs-3g
 sudo lsblk -o UUID,NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL,MODEL
 
-nano /etc/fstab # Add line "UUID=XXXX-XXXX /mnt/camera-spike-usb exfat defaults,uid=1000,gid=1000 0 0"
+sudo nano /etc/fstab # Add line "UUID=XXXX-XXXX /mnt/camera-spike-usb exfat defaults,uid=1000,gid=1000 0 0"
 
 nano .env # Edit "MEDIA_PATH=/mnt/camera-spike-usb"
 ```
